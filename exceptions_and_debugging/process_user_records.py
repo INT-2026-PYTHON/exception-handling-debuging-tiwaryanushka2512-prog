@@ -137,3 +137,56 @@ Explanation:
 =================================================
 
 """
+def process_user_records(records):
+    clean_records = []
+    error_log = []
+    
+    for index, record in enumerate(records):
+        try:
+            name = record["name"]
+            raw_age = record["age"]
+            raw_score = record["score"]
+            
+            age = int(raw_age)
+            score = float(raw_score)
+            
+        except (KeyError, TypeError) as e:
+            error_log.append((index, type(e).__name__, str(e)))
+        except ValueError as e:
+            error_log.append((index, type(e).__name__, str(e)))
+        else:
+            clean_records.append({
+                "name": name,
+                "age": age,
+                "score": score
+            })
+            
+    return (clean_records, error_log)
+
+
+def process_strict(records):
+    clean_records, error_log = process_user_records(records)
+    if error_log:
+        raise RuntimeError(f"{len(error_log)} record(s) failed to process")
+    return clean_records
+
+
+input_records = [
+    {"name": "Alice", "age": "25", "score": "88.5"},
+    {"name": "Bob", "age": "abc", "score": "70"},
+    {"name": "Carol", "age": "30"},
+    "not a dict",
+    {"name": "Dan", "age": "40", "score": "55.5"}
+]
+
+clean, errors = process_user_records(input_records)
+
+print("Clean Records:")
+print(clean)
+print("\nError Log:")
+print(errors)
+
+try:
+    process_strict(input_records)
+except RuntimeError as err:
+    print(f"\nStrict mode raised:Runtime Error:{err}")

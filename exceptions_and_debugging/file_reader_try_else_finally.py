@@ -124,3 +124,42 @@ Explanation:
 =================================================
 
 """
+def read_numbers(path):
+    total_sum = 0.0
+    lines_read = 0
+    f = None
+
+    try:
+        f = open(path, 'r')
+        for line in f:
+            clean_line = line.strip()
+            if not clean_line:
+                continue
+            total_sum += float(clean_line)
+            lines_read += 1
+    except FileNotFoundError:
+        return ("error", f"File not found: {path}", 0)
+    except PermissionError:
+        return ("error", "Permission denied", lines_read)
+    except ValueError:
+        return ("error", "Invalid number on a line", lines_read)
+    except Exception as e:
+        return ("error", str(e), lines_read)
+    else:
+        return ("ok", total_sum, lines_read)
+    finally:
+        if f is not None:
+            f.close()
+        print("Done reading")
+
+with open("numbers.txt", "w") as f1:
+    f1.write("10\n20\n30")
+
+with open("bad.txt", "w") as f2:
+    f2.write("10\nabc\n30")
+
+
+# --- EXAMPLE INPUTS EXECUTION ---
+print(read_numbers("numbers.txt"))
+print(read_numbers("missing.txt"))
+print(read_numbers("bad.txt"))
